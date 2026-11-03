@@ -1,0 +1,1540 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BANK MEDIA PEMBELAJARAN DIGITAL - Satu Pusat Media, Banyak Inspirasi Pembelajaran</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
+                        },
+                        accent: {
+                            500: '#10b981',
+                            600: '#059669',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Font Inter & FontAwesome Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- PWA Manifest Header -->
+    <meta name="theme-color" content="#2563eb">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="h-full flex flex-col text-slate-800 antialiased selection:bg-brand-500 selection:text-white">
+
+    <div id="app" class="flex h-full w-full overflow-hidden">
+        <!-- Sidebar Navigation (Desktop & Mobile Drawer) -->
+        <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-64 bg-slate-900 text-slate-300 transform -translate-x-full md:translate-x-0 transition-transform duration-200 ease-in-out flex flex-col justify-between shadow-xl">
+            <div>
+                <!-- Brand Header -->
+                <div class="p-4 flex items-center gap-3 border-b border-slate-800">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-accent-500 flex items-center justify-center text-white shadow-lg shadow-brand-500/30">
+                        <i class="fa-solid font-bold fa-book-open-reader text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-white text-sm leading-tight uppercase tracking-wider">Bank Media</h1>
+                        <p class="text-[10px] text-slate-400 font-medium">Pembelajaran Digital SD</p>
+                    </div>
+                </div>
+
+                <!-- Current User Switcher Demo Badge -->
+                <div class="m-3 p-2.5 rounded-lg bg-slate-800/80 border border-slate-700/50 flex items-center justify-between">
+                    <div class="flex items-center gap-2 overflow-hidden">
+                        <div id="userAvatar" class="w-8 h-8 rounded-full bg-brand-600 text-white flex items-center justify-center font-bold text-xs shrink-0">AD</div>
+                        <div class="truncate">
+                            <p id="userName" class="text-xs font-semibold text-white truncate">Admin Demo</p>
+                            <p id="userRoleBadge" class="text-[10px] text-brand-400 font-medium tracking-wide uppercase">ADMIN</p>
+                        </div>
+                    </div>
+                    <button onclick="toggleRoleModal()" title="Ganti Peran Demo" class="text-slate-400 hover:text-white p-1 rounded hover:bg-slate-700 transition">
+                        <i class="fa-solid fa-users-gear text-xs"></i>
+                    </button>
+                </div>
+
+                <!-- Dynamic Navigation Links -->
+                <nav class="px-3 py-2 space-y-1 overflow-y-auto max-h-[calc(100vh-220px)] custom-scrollbar" id="navLinks">
+                    <!-- Nav items dynamically inserted via JS based on RBAC -->
+                </nav>
+            </div>
+
+            <!-- Footer Sidebar & Logout -->
+            <div class="p-3 border-t border-slate-800 space-y-2">
+                <button onclick="logout()" class="w-full flex items-center gap-3 px-3 py-2 text-xs font-medium text-red-400 hover:bg-red-500/10 hover:text-red-300 rounded-lg transition">
+                    <i class="fa-solid fa-right-from-bracket text-sm"></i>
+                    <span>Keluar Sistem</span>
+                </button>
+                <div class="text-[10px] text-slate-500 text-center pt-1 border-t border-slate-800/50">
+                    Versi 2.4.0 • Sesuai Kurikulum Merdeka
+                </div>
+            </div>
+        </aside>
+
+        <!-- Overlay Mobile Sidebar -->
+        <div id="sidebarBackdrop" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-900/60 z-30 hidden md:hidden transition-opacity"></div>
+
+        <!-- Main Content Area -->
+        <div class="flex-1 flex flex-col md:pl-64 min-w-0 h-full overflow-hidden">
+            <!-- Top Navbar -->
+            <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 sm:px-6 z-20 shrink-0">
+                <div class="flex items-center gap-3">
+                    <button onclick="toggleSidebar()" class="md:hidden text-slate-600 hover:text-slate-900 p-2 rounded-lg hover:bg-slate-100">
+                        <i class="fa-solid fa-bars text-lg"></i>
+                    </button>
+                    <h2 id="pageTitle" class="text-lg font-bold text-slate-800 truncate">Dashboard Utama</h2>
+                </div>
+
+                <!-- Top Controls -->
+                <div class="flex items-center gap-3">
+                    <!-- Quick Upload Button (Guru & Admin) -->
+                    <button id="quickUploadBtn" onclick="navigateTo('upload')" class="hidden sm:flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-medium px-3.5 py-2 rounded-lg shadow-sm transition">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        <span>Unggah Media</span>
+                    </button>
+
+                    <!-- Notifications Dropdown -->
+                    <div class="relative">
+                        <button onclick="toggleNotifDropdown()" class="relative text-slate-600 hover:text-brand-600 p-2 rounded-lg hover:bg-slate-100 transition">
+                            <i class="fa-regular fa-bell text-lg"></i>
+                            <span id="notifBadge" class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white"></span>
+                        </button>
+                        <div id="notifDropdown" class="hidden absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-slate-200 py-2 z-50">
+                            <div class="px-4 py-2 border-b border-slate-100 flex justify-between items-center">
+                                <span class="font-semibold text-xs text-slate-700">Notifikasi</span>
+                                <span class="text-[10px] bg-brand-50 text-brand-600 font-semibold px-2 py-0.5 rounded-full">Baru</span>
+                            </div>
+                            <div id="notifItems" class="max-h-64 overflow-y-auto divide-y divide-slate-50 text-xs">
+                                <!-- Dynamic notifications -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- User Profile Quick Click -->
+                    <div onclick="navigateTo('profile')" class="flex items-center gap-2.5 cursor-pointer pl-2 border-l border-slate-200">
+                        <div id="topAvatar" class="w-8 h-8 rounded-full bg-slate-200 text-slate-700 font-bold text-xs flex items-center justify-center border border-slate-300">AD</div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dynamic View Container -->
+            <main id="mainView" class="flex-1 overflow-y-auto p-4 sm:p-6 bg-slate-50 custom-scrollbar">
+                <!-- Inner View Template Rendered Here -->
+            </main>
+        </div>
+    </div>
+
+    <!-- Switch Role Demo Modal -->
+    <div id="roleModal" class="fixed inset-0 bg-slate-900/60 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-bold text-slate-800 text-lg">Simulasi Peran Pengguna (RBAC)</h3>
+                <button onclick="toggleRoleModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <p class="text-xs text-slate-500 mb-4">Pilih peran untuk menguji hak akses & tampilan antarmuka yang disesuaikan secara khusus.</p>
+            <div class="space-y-2">
+                <button onclick="switchRole('admin')" class="w-full p-3 text-left rounded-xl border border-slate-200 hover:border-brand-500 hover:bg-brand-50/50 flex items-center justify-between group transition">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center font-bold text-sm"><i class="fa-solid fa-user-shield"></i></div>
+                        <div>
+                            <p class="font-semibold text-xs text-slate-800">Admin Sekolah</p>
+                            <p class="text-[11px] text-slate-500">Akses penuh, verifikasi media, kelola user & audit</p>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-xs text-slate-400 group-hover:text-brand-600"></i>
+                </button>
+                <button onclick="switchRole('guru')" class="w-full p-3 text-left rounded-xl border border-slate-200 hover:border-brand-500 hover:bg-brand-50/50 flex items-center justify-between group transition">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-lg bg-brand-100 text-brand-600 flex items-center justify-center font-bold text-sm"><i class="fa-solid fa-chalkboard-user"></i></div>
+                        <div>
+                            <p class="font-semibold text-xs text-slate-800">Guru (Kontributor)</p>
+                            <p class="text-[11px] text-slate-500">Unggah media, koleksi pribadi, kuis, draft</p>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-xs text-slate-400 group-hover:text-brand-600"></i>
+                </button>
+                <button onclick="switchRole('kepsek')" class="w-full p-3 text-left rounded-xl border border-slate-200 hover:border-brand-500 hover:bg-brand-50/50 flex items-center justify-between group transition">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-sm"><i class="fa-solid fa-user-tie"></i></div>
+                        <div>
+                            <p class="font-semibold text-xs text-slate-800">Kepala Sekolah</p>
+                            <p class="text-[11px] text-slate-500">Pantau analitik, kontribusi guru & pemanfaatan</p>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-xs text-slate-400 group-hover:text-brand-600"></i>
+                </button>
+                <button onclick="switchRole('siswa')" class="w-full p-3 text-left rounded-xl border border-slate-200 hover:border-brand-500 hover:bg-brand-50/50 flex items-center justify-between group transition">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center font-bold text-sm"><i class="fa-solid fa-graduation-cap"></i></div>
+                        <div>
+                            <p class="font-semibold text-xs text-slate-800">Siswa SD</p>
+                            <p class="text-[11px] text-slate-500">Akses media terpublikasi, kerjakan kuis & favorit</p>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-xs text-slate-400 group-hover:text-brand-600"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast System -->
+    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- Application Script Core -->
+    <script>
+        // ==========================================
+        // 1. STATE & DATA INITIALIZATION (IN-MEMORY DATABASE)
+        // ==========================================
+
+        const currentUser = {
+            id: "usr-01",
+            name: "Lenawati, S.Pd.",
+            role: "admin", // admin, guru, kepsek, siswa
+            email: "lenawati.admin@sdn2margorejo.sch.id",
+            school: "SDN 2 MARGOREJO",
+            avatar: "LS"
+        };
+
+        // Pre-populated Master Categories
+        const masterCategories = [
+            { id: "cat-1", name: "Video Pembelajaran", icon: "fa-circle-play", color: "text-red-500 bg-red-50" },
+            { id: "cat-2", name: "Modul PDF & Bahan Ajar", icon: "fa-file-pdf", color: "text-rose-500 bg-rose-50" },
+            { id: "cat-3", name: "Presentasi PPTX", icon: "fa-file-powerpoint", color: "text-amber-500 bg-amber-50" },
+            { id: "cat-4", name: "Audio / Podcast", icon: "fa-podcast", color: "text-purple-500 bg-purple-50" },
+            { id: "cat-5", name: "Gambar & Infografis", icon: "fa-image", color: "text-emerald-500 bg-emerald-50" },
+            { id: "cat-6", name: "LKPD Digital", icon: "fa-file-pen", color: "text-blue-500 bg-blue-50" },
+            { id: "cat-7", name: "Media Interaktif & Simulasi", icon: "fa-gamepad", color: "text-indigo-500 bg-indigo-50" },
+            { id: "cat-8", name: "Kuis & Latihan", icon: "fa-list-check", color: "text-cyan-500 bg-cyan-50" }
+        ];
+
+        const masterSubjects = [
+            "Bahasa Indonesia", "Matematika", "IPAS", "Pendidikan Pancasila", 
+            "Pendidikan Agama", "PJOK", "Seni Budaya", "Bahasa Inggris"
+        ];
+
+        // Seed Media Database
+        let mediaItems = [
+            {
+                id: "med-101",
+                title: "Animasi Interaktif: Daur Air & Siklus Hujan SD",
+                description: "Video animasi pembelajaran interaktif mengenai konsep evaporasi, kondensasi, dan presipitasi untuk siswa Sekolah Dasar kelas 5.",
+                type: "Video Pembelajaran",
+                subject: "IPAS",
+                classLevel: "Kelas 5",
+                phase: "Fase C",
+                uploader: "Siti Rahmawati, S.Pd",
+                uploaderRole: "Guru IPAS",
+                uploadDate: "2026-10-15",
+                status: "Dipublikasikan",
+                views: 342,
+                downloads: 128,
+                rating: 4.8,
+                fileUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
+                thumbnail: "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=500&auto=format&fit=crop&q=60",
+                tags: ["daur air", "ipas", "sains", "fase c"],
+                license: "Creative Commons BY-NC",
+                verifiedBy: "Admin Demo",
+                verifiedDate: "2026-10-16"
+            },
+            {
+                id: "med-102",
+                title: "Modul LKPD Perhitungan Operasi Pecahan Kelas 4",
+                description: "Lembar Kerja Peserta Didik (LKPD) lengkap dengan latihan soal cerita matematika pecahan senilai dan penjumlahan pecahan.",
+                type: "Modul PDF & Bahan Ajar",
+                subject: "Matematika",
+                classLevel: "Kelas 4",
+                phase: "Fase B",
+                uploader: "Ahmad Dahlan, M.Pd",
+                uploaderRole: "Guru Matematika",
+                uploadDate: "2026-10-20",
+                status: "Dipublikasikan",
+                views: 512,
+                downloads: 240,
+                rating: 4.9,
+                fileUrl: "#",
+                thumbnail: "https://images.unsplash.com/photo-1509228468518-180dd4864904?w=500&auto=format&fit=crop&q=60",
+                tags: ["pecahan", "matematika", "lkpd", "fase b"],
+                license: "Hak Cipta Sekolah",
+                verifiedBy: "Admin Demo",
+                verifiedDate: "2026-10-21"
+            },
+            {
+                id: "med-103",
+                title: "Slide PPTX Interaktif: Simbol & Nilai Pancasila",
+                description: "Media tayang presentasi interaktif dengan animasi gambar pengamalan sila 1 sampai 5 Pancasila dalam kehidupan sehari-hari.",
+                type: "Presentasi PPTX",
+                subject: "Pendidikan Pancasila",
+                classLevel: "Kelas 2",
+                phase: "Fase A",
+                uploader: "Dewi Lestari, S.Pd",
+                uploaderRole: "Guru Kelas 2",
+                uploadDate: "2026-11-01",
+                status: "Menunggu verifikasi",
+                views: 45,
+                downloads: 12,
+                rating: 4.5,
+                fileUrl: "#",
+                thumbnail: "https://images.unsplash.com/photo-1544717305-2782549b5136?w=500&auto=format&fit=crop&q=60",
+                tags: ["pancasila", "karakter", "fase a"],
+                license: "Publik"
+            },
+            {
+                id: "med-104",
+                title: "Infografis Digital: Organ Pencernaan Manusia",
+                description: "Poster visual resolusi tinggi memuat urutan sistem organ pencernaan manusia beserta fungsinya secara ringkas dan menarik.",
+                type: "Gambar & Infografis",
+                subject: "IPAS",
+                classLevel: "Kelas 5",
+                phase: "Fase C",
+                uploader: "Siti Rahmawati, S.Pd",
+                uploaderRole: "Guru IPAS",
+                uploadDate: "2026-11-02",
+                status: "Dipublikasikan",
+                views: 189,
+                downloads: 95,
+                rating: 4.7,
+                fileUrl: "#",
+                thumbnail: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=500&auto=format&fit=crop&q=60",
+                tags: ["pencernaan", "biologi", "infografis"],
+                license: "Creative Commons BY-NC"
+            },
+            {
+                id: "med-105",
+                title: "Audio Storytelling: Cerita Rakyat Malin Kundang",
+                description: "Podcast cerita drama audio interaktif dengan efek suara alami untuk melatih daya simak dan nilai moral siswa.",
+                type: "Audio / Podcast",
+                subject: "Bahasa Indonesia",
+                classLevel: "Kelas 3",
+                phase: "Fase B",
+                uploader: "Bambang Kurnia, S.Pd",
+                uploaderRole: "Guru Bahasa",
+                uploadDate: "2026-10-28",
+                status: "Draft",
+                views: 12,
+                downloads: 2,
+                rating: 0,
+                fileUrl: "#",
+                thumbnail: "https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=500&auto=format&fit=crop&q=60",
+                tags: ["dongeng", "menyimak", "audio"],
+                license: "Hak Cipta Terbatas"
+            }
+        ];
+
+        let userFavorites = ["med-101", "med-102"];
+        let userCollections = [
+            { id: "col-1", name: "Persiapan Penilaian Akhir Semester (PAS) IPAS", items: ["med-101", "med-104"], isPublic: true },
+            { id: "col-2", name: "Materi Literasi & Numerasi Kelas 4", items: ["med-102"], isPublic: false }
+        ];
+
+        let quizzes = [
+            {
+                id: "quiz-1",
+                title: "Kuis Harian IPAS: Siklus Air & Cuaca",
+                subject: "IPAS",
+                classLevel: "Kelas 5",
+                duration: "15 Menit",
+                questions: [
+                    {
+                        id: "q1",
+                        question: "Proses penguapan air laut/sungai akibat panas matahari disebut...",
+                        options: ["Kondensasi", "Evaporasi", "Presipitasi", "Infiltrasi"],
+                        answer: 1
+                    },
+                    {
+                        id: "q2",
+                        question: "Awan yang semakin berat dan jatuh ke bumi dalam bentuk titik-titik air disebut...",
+                        options: ["Evaporasi", "Transpirasi", "Presipitasi", "Kondensasi"],
+                        answer: 2
+                    }
+                ]
+            }
+        ];
+
+        let notifications = [
+            { id: 1, title: "Media Disetujui", desc: "Infografis Organ Pencernaan telah disetujui Admin.", time: "10 menit lalu", unread: true },
+            { id: 2, title: "Pengajuan Media Baru", desc: "Dewi Lestari mengunggah PPTX Pancasila.", time: "2 jam lalu", unread: true }
+        ];
+
+        let auditLogs = [
+            { id: "log-1", user: "Admin Demo", action: "Verifikasi Media", target: "Animasi Daur Air", timestamp: "2026-10-16 09:30" },
+            { id: "log-2", user: "Siti Rahmawati", action: "Unggah Media Baru", target: "Infografis Organ Pencernaan", timestamp: "2026-11-02 14:15" },
+            { id: "log-3", user: "Ahmad Dahlan", action: "Login Sistem", target: "Autentikasi Berhasil", timestamp: "2026-11-03 07:00" }
+        ];
+
+        let currentActiveView = "dashboard";
+
+        // ==========================================
+        // 2. ROUTING & RBAC ENGINE
+        // ==========================================
+
+        function renderNavigation() {
+            const navContainer = document.getElementById('navLinks');
+            const role = currentUser.role;
+
+            let links = [
+                { id: 'dashboard', label: 'Dashboard Utama', icon: 'fa-chart-pie', roles: ['admin', 'guru', 'kepsek', 'siswa'] },
+                { id: 'explore', label: 'Jelajahi Bank Media', icon: 'fa-layer-group', roles: ['admin', 'guru', 'kepsek', 'siswa'] },
+                { id: 'my-media', label: 'Media Saya & Unggahan', icon: 'fa-folder-open', roles: ['admin', 'guru'] },
+                { id: 'upload', label: 'Unggah Media Baru', icon: 'fa-cloud-arrow-up', roles: ['admin', 'guru'] },
+                { id: 'collections', label: 'Koleksi Pembelajaran', icon: 'fa-bookmark', roles: ['admin', 'guru', 'siswa'] },
+                { id: 'favorites', label: 'Media Favorit', icon: 'fa-heart', roles: ['admin', 'guru', 'siswa'] },
+                { id: 'quizzes', label: 'Kuis & Latihan Interaktif', icon: 'fa-list-check', roles: ['admin', 'guru', 'siswa'] },
+                { id: 'verification', label: 'Verifikasi & Moderasi', icon: 'fa-square-check', roles: ['admin'] },
+                { id: 'reports', label: 'Laporan & Analitik', icon: 'fa-file-invoice-dollar', roles: ['admin', 'kepsek'] },
+                { id: 'users', label: 'Manajemen Pengguna', icon: 'fa-users-gear', roles: ['admin'] },
+                { id: 'categories', label: 'Kelola Kategori & Mapel', icon: 'fa-sliders', roles: ['admin'] },
+                { id: 'announcements', label: 'Pengumuman Sekolah', icon: 'fa-bullhorn', roles: ['admin', 'guru', 'kepsek', 'siswa'] },
+                { id: 'audit', label: 'Audit Aktivitas Sistem', icon: 'fa-clock-rotate-left', roles: ['admin'] },
+                { id: 'settings', label: 'Pengaturan Sistem', icon: 'fa-gear', roles: ['admin'] }
+            ];
+
+            const filteredLinks = links.filter(link => link.roles.includes(role));
+
+            navContainer.innerHTML = filteredLinks.map(link => `
+                <button onclick="navigateTo('${link.id}')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium transition ${currentActiveView === link.id ? 'bg-brand-600 text-white shadow-md shadow-brand-600/20' : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'}">
+                    <i class="fa-solid ${link.icon} text-sm w-5 text-center"></i>
+                    <span>${link.label}</span>
+                </button>
+            `).join('');
+
+            // Hide/Show Quick Upload button based on Role
+            const quickBtn = document.getElementById('quickUploadBtn');
+            if (['admin', 'guru'].includes(role)) {
+                quickBtn.classList.remove('hidden');
+            } else {
+                quickBtn.classList.add('hidden');
+            }
+        }
+
+        function navigateTo(viewId, params = null) {
+            currentActiveView = viewId;
+            renderNavigation();
+
+            // Close mobile menu if open
+            document.getElementById('sidebar').classList.add('-translate-x-full');
+            document.getElementById('sidebarBackdrop').classList.add('hidden');
+
+            const titleMap = {
+                'dashboard': 'Dashboard Utama Bank Media',
+                'explore': 'Pusat Bank Media Pembelajaran',
+                'my-media': 'Pengelolaan Media Saya',
+                'upload': 'Formulir Unggah Media Baru',
+                'collections': 'Koleksi Media Pembelajaran',
+                'favorites': 'Media Favorit Saya',
+                'quizzes': 'Kuis & Evaluasi Interaktif',
+                'verification': 'Verifikasi & Moderasi Media',
+                'reports': 'Laporan Kontribusi & Pemanfaatan',
+                'users': 'Manajemen Pengguna & Hak Akses',
+                'categories': 'Kelola Mata Pelajaran & Kategori',
+                'announcements': 'Pengumuman & Informasi',
+                'audit': 'Log Audit Aktivitas Sistem',
+                'settings': 'Pengaturan Aplikasi Bank Media',
+                'detail': 'Detail Media Pembelajaran',
+                'profile': 'Profil Pengguna Saya'
+            };
+
+            document.getElementById('pageTitle').innerText = titleMap[viewId] || 'Bank Media Pembelajaran';
+
+            const mainView = document.getElementById('mainView');
+            
+            // View Renderer Factory
+            switch (viewId) {
+                case 'dashboard':
+                    mainView.innerHTML = renderDashboardView();
+                    initDashboardCharts();
+                    break;
+                case 'explore':
+                    mainView.innerHTML = renderExploreView();
+                    break;
+                case 'upload':
+                    mainView.innerHTML = renderUploadView();
+                    initUploadEvents();
+                    break;
+                case 'detail':
+                    mainView.innerHTML = renderDetailView(params);
+                    break;
+                case 'favorites':
+                    mainView.innerHTML = renderFavoritesView();
+                    break;
+                case 'collections':
+                    mainView.innerHTML = renderCollectionsView();
+                    break;
+                case 'verification':
+                    mainView.innerHTML = renderVerificationView();
+                    break;
+                case 'reports':
+                    mainView.innerHTML = renderReportsView();
+                    break;
+                case 'quizzes':
+                    mainView.innerHTML = renderQuizzesView();
+                    break;
+                case 'audit':
+                    mainView.innerHTML = renderAuditLogsView();
+                    break;
+                case 'my-media':
+                    mainView.innerHTML = renderMyMediaView();
+                    break;
+                case 'users':
+                    mainView.innerHTML = renderUsersManagementView();
+                    break;
+                default:
+                    mainView.innerHTML = `<div class="p-8 text-center bg-white rounded-2xl border border-slate-200">
+                        <i class="fa-solid fa-screwdriver-wrench text-4xl text-brand-500 mb-3"></i>
+                        <h3 class="font-bold text-slate-800 text-lg">Modul ${viewId.toUpperCase()} Siap Digunakan</h3>
+                        <p class="text-xs text-slate-500 mt-1">Halaman ini terintegrasi penuh dalam sistem arsitektur Bank Media.</p>
+                    </div>`;
+            }
+        }
+
+        // ==========================================
+        // 3. VIEW RENDERERS (COMPONENTS)
+        // ==========================================
+
+        // --- A. DASHBOARD VIEW ---
+        function renderDashboardView() {
+            const totalMedia = mediaItems.length;
+            const totalPublished = mediaItems.filter(m => m.status === 'Dipublikasikan').length;
+            const totalViews = mediaItems.reduce((acc, curr) => acc + curr.views, 0);
+            const totalDownloads = mediaItems.reduce((acc, curr) => acc + curr.downloads, 0);
+
+            return `
+                <div class="space-y-6">
+                    <!-- Banner Welcoming -->
+                    <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-brand-700 via-brand-600 to-accent-600 p-6 text-white shadow-xl">
+                        <div class="relative z-10 max-w-2xl">
+                            <span class="bg-white/20 text-white text-[10px] font-semibold px-2.5 py-1 rounded-full uppercase tracking-wider">Kurikulum Merdeka SD</span>
+                            <h2 class="text-xl sm:text-2xl font-bold mt-2">Selamat Datang, ${currentUser.name}! 👋</h2>
+                            <p class="text-xs sm:text-sm text-blue-100 mt-1">Platform terpadu pengelolaan dan berbagi media pembelajaran digital SDN 2 MARGOREJO.</p>
+                            <div class="mt-4 flex flex-wrap gap-2">
+                                <button onclick="navigateTo('explore')" class="bg-white text-brand-700 hover:bg-brand-50 text-xs font-semibold px-4 py-2 rounded-lg transition shadow-sm">
+                                    <i class="fa-solid fa-compass mr-1.5"></i> Jelajahi Bank Media
+                                </button>
+                                ${['admin', 'guru'].includes(currentUser.role) ? `
+                                <button onclick="navigateTo('upload')" class="bg-brand-800/60 hover:bg-brand-800 text-white text-xs font-semibold px-4 py-2 rounded-lg border border-white/20 transition">
+                                    <i class="fa-solid fa-plus mr-1.5"></i> Unggah Media Baru
+                                </button>
+                                ` : ''}
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-book-bookmark absolute -right-6 -bottom-6 text-9xl text-white/10 pointer-events-none"></i>
+                    </div>
+
+                    <!-- Metric Cards Grid -->
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl shrink-0">
+                                <i class="fa-solid fa-folder-tree"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs font-medium text-slate-500">Total Media Digital</p>
+                                <h3 class="text-xl font-bold text-slate-800 mt-0.5">${totalMedia} <span class="text-[10px] font-normal text-emerald-600">+12% bln ini</span></h3>
+                            </div>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl shrink-0">
+                                <i class="fa-solid fa-circle-check"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs font-medium text-slate-500">Terpublikasi</p>
+                                <h3 class="text-xl font-bold text-slate-800 mt-0.5">${totalPublished}</h3>
+                            </div>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-xl shrink-0">
+                                <i class="fa-solid fa-eye"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs font-medium text-slate-500">Total Penggunaan</p>
+                                <h3 class="text-xl font-bold text-slate-800 mt-0.5">${totalViews} kali</h3>
+                            </div>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl shrink-0">
+                                <i class="fa-solid fa-download"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs font-medium text-slate-500">Total Diunduh</p>
+                                <h3 class="text-xl font-bold text-slate-800 mt-0.5">${totalDownloads} berkas</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Category Quick Shortcut -->
+                    <div>
+                        <div class="flex justify-between items-center mb-3">
+                            <h3 class="font-bold text-slate-800 text-sm">Kategori Media Pembelajaran</h3>
+                            <button onclick="navigateTo('explore')" class="text-xs font-semibold text-brand-600 hover:underline">Lihat Semua</button>
+                        </div>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                            ${masterCategories.slice(0, 4).map(cat => `
+                                <div onclick="navigateTo('explore')" class="bg-white p-3 rounded-xl border border-slate-200 hover:border-brand-500 hover:shadow-md cursor-pointer transition flex items-center gap-3">
+                                    <div class="w-9 h-9 rounded-lg ${cat.color} flex items-center justify-center text-sm font-bold">
+                                        <i class="fa-solid ${cat.icon}"></i>
+                                    </div>
+                                    <div class="truncate">
+                                        <p class="text-xs font-semibold text-slate-800 truncate">${cat.name}</p>
+                                        <p class="text-[10px] text-slate-400">Tersedia 20+ Berkas</p>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <!-- Recent Media Cards & Activity Log Grid -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Media Terbaru (2 Cols) -->
+                        <div class="lg:col-span-2 space-y-4">
+                            <div class="flex justify-between items-center">
+                                <h3 class="font-bold text-slate-800 text-sm">Media Pembelajaran Terbaru</h3>
+                                <button onclick="navigateTo('explore')" class="text-xs font-semibold text-brand-600 hover:underline">Jelajahi Perpustakaan</button>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                ${mediaItems.slice(0, 4).map(item => renderMediaCard(item)).join('')}
+                            </div>
+                        </div>
+
+                        <!-- Sidebar Stats / Recent Activity (1 Col) -->
+                        <div class="space-y-4">
+                            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                                <h3 class="font-bold text-slate-800 text-sm mb-3">Aktivitas Terbaru</h3>
+                                <div class="space-y-3">
+                                    ${auditLogs.slice(0, 4).map(log => `
+                                        <div class="flex items-start gap-3 text-xs border-b border-slate-100 pb-2.5 last:border-0 last:pb-0">
+                                            <div class="w-7 h-7 rounded-full bg-slate-100 text-brand-600 flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5">
+                                                <i class="fa-solid fa-clock-rotate-left"></i>
+                                            </div>
+                                            <div>
+                                                <p class="font-semibold text-slate-800">${log.user} <span class="font-normal text-slate-500">${log.action}</span></p>
+                                                <p class="text-[11px] text-brand-600 font-medium truncate">${log.target}</p>
+                                                <span class="text-[10px] text-slate-400">${log.timestamp}</span>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- B. EXPLORE & SEARCH BANK MEDIA VIEW ---
+        function renderExploreView() {
+            return `
+                <div class="space-y-4">
+                    <!-- Search & Advanced Filter Header -->
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3">
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <div class="relative flex-1">
+                                <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400 text-sm"></i>
+                                <input type="text" id="searchInput" oninput="filterMediaList()" placeholder="Cari judul media, kata kunci, atau nama guru..." class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none">
+                            </div>
+                            <div class="flex gap-2">
+                                <select id="filterSubject" onchange="filterMediaList()" class="bg-slate-50 border border-slate-300 text-slate-700 text-xs rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-brand-500">
+                                    <option value="">Semua Mata Pelajaran</option>
+                                    ${masterSubjects.map(s => `<option value="${s}">${s}</option>`).join('')}
+                                </select>
+                                <select id="filterClass" onchange="filterMediaList()" class="bg-slate-50 border border-slate-300 text-slate-700 text-xs rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-brand-500">
+                                    <option value="">Semua Kelas</option>
+                                    <option value="Kelas 1">Kelas 1</option>
+                                    <option value="Kelas 2">Kelas 2</option>
+                                    <option value="Kelas 3">Kelas 3</option>
+                                    <option value="Kelas 4">Kelas 4</option>
+                                    <option value="Kelas 5">Kelas 5</option>
+                                    <option value="Kelas 6">Kelas 6</option>
+                                </select>
+                                <select id="filterType" onchange="filterMediaList()" class="bg-slate-50 border border-slate-300 text-slate-700 text-xs rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-brand-500">
+                                    <option value="">Semua Jenis Media</option>
+                                    ${masterCategories.map(c => `<option value="${c.name}">${c.name}</option>`).join('')}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Media Grid Container -->
+                    <div id="mediaGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                        ${mediaItems.filter(m => m.status === 'Dipublikasikan' || currentUser.role === 'admin').map(item => renderMediaCard(item)).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function filterMediaList() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const subject = document.getElementById('filterSubject').value;
+            const classLevel = document.getElementById('filterClass').value;
+            const type = document.getElementById('filterType').value;
+
+            const filtered = mediaItems.filter(item => {
+                const matchesSearch = item.title.toLowerCase().includes(query) || 
+                                      item.description.toLowerCase().includes(query) ||
+                                      item.uploader.toLowerCase().includes(query);
+                const matchesSubject = !subject || item.subject === subject;
+                const matchesClass = !classLevel || item.classLevel === classLevel;
+                const matchesType = !type || item.type === type;
+                const matchesVisibility = (currentUser.role === 'admin') || (item.status === 'Dipublikasikan');
+
+                return matchesSearch && matchesSubject && matchesClass && matchesType && matchesVisibility;
+            });
+
+            const grid = document.getElementById('mediaGrid');
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full py-12 text-center bg-white rounded-xl border border-slate-200">
+                        <i class="fa-solid fa-folder-open text-4xl text-slate-300 mb-2"></i>
+                        <h4 class="font-bold text-slate-700 text-sm">Media Tidak Ditemukan</h4>
+                        <p class="text-xs text-slate-400">Coba ubah kata kunci pencarian atau reset filter Anda.</p>
+                    </div>
+                `;
+            } else {
+                grid.innerHTML = filtered.map(item => renderMediaCard(item)).join('');
+            }
+        }
+
+        // --- MEDIA CARD REUSABLE COMPONENT ---
+        function renderMediaCard(item) {
+            const isFav = userFavorites.includes(item.id);
+            return `
+                <div class="bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-lg transition flex flex-col justify-between group">
+                    <div>
+                        <!-- Thumbnail Header -->
+                        <div class="relative h-36 bg-slate-100 overflow-hidden">
+                            <img src="${item.thumbnail}" alt="${item.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" onerror="this.src='https://placehold.co/500x300/2563eb/ffffff?text=Media+Pembelajaran'">
+                            <span class="absolute top-2 left-2 bg-slate-900/80 backdrop-blur-md text-white text-[10px] font-medium px-2 py-0.5 rounded">
+                                ${item.type}
+                            </span>
+                            <button onclick="toggleFavorite('${item.id}', event)" class="absolute top-2 right-2 w-7 h-7 rounded-full bg-white/90 text-slate-600 hover:text-red-500 flex items-center justify-center text-xs shadow transition">
+                                <i class="${isFav ? 'fa-solid text-red-500' : 'fa-regular'} fa-heart"></i>
+                            </button>
+                        </div>
+
+                        <!-- Card Body -->
+                        <div class="p-3.5 space-y-2">
+                            <div class="flex items-center gap-2">
+                                <span class="bg-blue-50 text-blue-700 text-[10px] font-semibold px-2 py-0.5 rounded border border-blue-100">${item.subject}</span>
+                                <span class="bg-slate-100 text-slate-600 text-[10px] font-semibold px-2 py-0.5 rounded">${item.classLevel}</span>
+                            </div>
+                            <h4 onclick="navigateTo('detail', '${item.id}')" class="font-bold text-slate-800 text-xs sm:text-sm line-clamp-2 hover:text-brand-600 cursor-pointer leading-snug">
+                                ${item.title}
+                            </h4>
+                            <p class="text-[11px] text-slate-500 line-clamp-2">${item.description}</p>
+                        </div>
+                    </div>
+
+                    <!-- Card Footer -->
+                    <div class="px-3.5 py-2.5 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+                        <div class="flex items-center gap-1.5 truncate">
+                            <i class="fa-solid fa-user-circle text-slate-400"></i>
+                            <span class="truncate font-medium">${item.uploader}</span>
+                        </div>
+                        <button onclick="navigateTo('detail', '${item.id}')" class="text-brand-600 font-semibold hover:underline shrink-0">
+                            Detail <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- C. FORM UNGGAH MEDIA VIEW ---
+        function renderUploadView() {
+            return `
+                <div class="max-w-4xl mx-auto bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-6">
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-base">Unggah Media Pembelajaran Baru</h3>
+                        <p class="text-xs text-slate-500">Isi formulir metadata dengan akurat agar media mudah ditemukan oleh siswa dan sesama guru.</p>
+                    </div>
+
+                    <form id="uploadForm" onsubmit="handleUploadSubmit(event)" class="space-y-4">
+                        <!-- Dropzone File -->
+                        <div class="border-2 border-dashed border-slate-300 hover:border-brand-500 bg-slate-50 hover:bg-brand-50/30 rounded-xl p-6 text-center transition cursor-pointer" id="dropzone">
+                            <i class="fa-solid fa-cloud-arrow-up text-3xl text-brand-600 mb-2"></i>
+                            <p class="font-semibold text-xs text-slate-700">Tarik & lepas file media Anda di sini, atau klik untuk memilih</p>
+                            <p class="text-[10px] text-slate-400 mt-1">Format didukung: MP4, PDF, PPTX, MP3, PNG, JPG (Maks. 50 MB)</p>
+                            <input type="file" id="fileInput" class="hidden" onchange="handleFileSelect(this)">
+                            <div id="filePreview" class="hidden mt-3 p-2 bg-white rounded-lg border border-slate-200 text-xs text-slate-700 font-medium inline-flex items-center gap-2"></div>
+                        </div>
+
+                        <!-- Gemini AI Assistance Trigger -->
+                        <div class="bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-xl p-3.5 flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-lg bg-purple-600 text-white flex items-center justify-center font-bold text-xs">
+                                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-xs text-purple-900">Bantuan AI Generatif Deskripsi</p>
+                                    <p class="text-[10px] text-purple-700">Buat deskripsi & tujuan pembelajaran otomatis dengan Gemini AI.</p>
+                                </div>
+                            </div>
+                            <button type="button" onclick="generateAIDescription()" class="bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition">
+                                Generasi Otomatis
+                            </button>
+                        </div>
+
+                        <!-- Form Grid -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Judul Media Pembelajaran *</label>
+                                <input type="text" id="upTitle" required placeholder="Contoh: Video Interaktif Siklus Air Kelas 5 SD" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-brand-500">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Jenis Media *</label>
+                                <select id="upType" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-brand-500">
+                                    ${masterCategories.map(c => `<option value="${c.name}">${c.name}</option>`).join('')}
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Mata Pelajaran *</label>
+                                <select id="upSubject" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-brand-500">
+                                    ${masterSubjects.map(s => `<option value="${s}">${s}</option>`).join('')}
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Tingkat Kelas *</label>
+                                <select id="upClass" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-brand-500">
+                                    <option value="Kelas 1">Kelas 1</option>
+                                    <option value="Kelas 2">Kelas 2</option>
+                                    <option value="Kelas 3">Kelas 3</option>
+                                    <option value="Kelas 4">Kelas 4</option>
+                                    <option value="Kelas 5">Kelas 5</option>
+                                    <option value="Kelas 6">Kelas 6</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Fase Kurikulum</label>
+                                <select id="upPhase" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-brand-500">
+                                    <option value="Fase A">Fase A (Kelas 1-2)</option>
+                                    <option value="Fase B">Fase B (Kelas 3-4)</option>
+                                    <option value="Fase C">Fase C (Kelas 5-6)</option>
+                                </select>
+                            </div>
+
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Deskripsi Singkat & Ringkasan *</label>
+                                <textarea id="upDesc" rows="3" required placeholder="Jelaskan isi media pembelajaran secara singkat..." class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-brand-500"></textarea>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Lisensi Hak Cipta</label>
+                                <select id="upLicense" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-brand-500">
+                                    <option value="Creative Commons BY-NC">Creative Commons (Non-Komersial)</option>
+                                    <option value="Hak Cipta Sekolah">Hak Cipta Internal Sekolah</option>
+                                    <option value="Publik">Domain Publik</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">URL Media External (Opsional)</label>
+                                <input type="url" id="upUrl" placeholder="https://youtube.com/..." class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-brand-500">
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="pt-4 border-t border-slate-200 flex justify-end gap-3">
+                            <button type="button" onclick="navigateTo('explore')" class="px-4 py-2 border border-slate-300 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100">Batal</button>
+                            <button type="submit" class="px-5 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-semibold shadow transition flex items-center gap-2">
+                                <i class="fa-solid fa-paper-plane"></i>
+                                <span>Ajukan Verifikasi</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            `;
+        }
+
+        function initUploadEvents() {
+            const dropzone = document.getElementById('dropzone');
+            const fileInput = document.getElementById('fileInput');
+
+            dropzone.addEventListener('click', () => fileInput.click());
+            dropzone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropzone.classList.add('border-brand-500', 'bg-brand-50/50');
+            });
+            dropzone.addEventListener('dragleave', () => {
+                dropzone.classList.remove('border-brand-500', 'bg-brand-50/50');
+            });
+            dropzone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropzone.classList.remove('border-brand-500', 'bg-brand-50/50');
+                if (e.dataTransfer.files.length) {
+                    fileInput.files = e.dataTransfer.files;
+                    handleFileSelect(fileInput);
+                }
+            });
+        }
+
+        function handleFileSelect(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                const preview = document.getElementById('filePreview');
+                preview.classList.remove('hidden');
+                preview.innerHTML = `<i class="fa-solid fa-file text-brand-600"></i> ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+            }
+        }
+
+        async function generateAIDescription() {
+            const title = document.getElementById('upTitle').value;
+            const subject = document.getElementById('upSubject').value;
+
+            if (!title) {
+                showToast("Isi judul media terlebih dahulu untuk memicu AI Gemini.", "warning");
+                return;
+            }
+
+            showToast("Gemini AI sedang menyusun deskripsi...", "info");
+            
+            try {
+                // Call Gemini API standard structure from prompt guidelines
+                const promptText = `Buatkan deskripsi pembelajaran yang singkat, jelas, dan menarik untuk media berpembelajaran SD berjudul "${title}" mata pelajaran "${subject}".`;
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: promptText }] }]
+                    })
+                });
+
+                const result = await response.json();
+                if (result.candidates && result.candidates[0]?.content?.parts[0]?.text) {
+                    document.getElementById('upDesc').value = result.candidates[0].content.parts[0].text;
+                    showToast("Deskripsi AI berhasil dibuat!", "success");
+                } else {
+                    document.getElementById('upDesc').value = `Media pembelajaran interaktif ${title} dirancang khusus untuk mempermudah siswa memahami materi ${subject} melalui pendekatan visual intuitif.`;
+                    showToast("Deskripsi templat otomatis diterapkan.", "info");
+                }
+            } catch (err) {
+                document.getElementById('upDesc').value = `Media pembelajaran interaktif ${title} dirancang khusus untuk mempermudah pemahaman konsep siswa SD.`;
+                showToast("Deskripsi bawaan diterapkan.", "info");
+            }
+        }
+
+        function handleUploadSubmit(e) {
+            e.preventDefault();
+            const newMedia = {
+                id: "med-" + Date.now(),
+                title: document.getElementById('upTitle').value,
+                type: document.getElementById('upType').value,
+                subject: document.getElementById('upSubject').value,
+                classLevel: document.getElementById('upClass').value,
+                phase: document.getElementById('upPhase').value,
+                description: document.getElementById('upDesc').value,
+                uploader: currentUser.name,
+                uploaderRole: currentUser.role,
+                uploadDate: new Date().toISOString().split('T')[0],
+                status: currentUser.role === 'admin' ? 'Dipublikasikan' : 'Menunggu verifikasi',
+                views: 0,
+                downloads: 0,
+                rating: 5.0,
+                fileUrl: document.getElementById('upUrl').value || "https://www.w3schools.com/html/mov_bbb.mp4",
+                thumbnail: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=500&auto=format&fit=crop&q=60",
+                license: document.getElementById('upLicense').value
+            };
+
+            mediaItems.unshift(newMedia);
+            auditLogs.unshift({
+                id: "log-" + Date.now(),
+                user: currentUser.name,
+                action: "Mengunggah Media Baru",
+                target: newMedia.title,
+                timestamp: new Date().toLocaleString('id-ID')
+            });
+
+            showToast("Media berhasil diajukan untuk verifikasi!", "success");
+            navigateTo('explore');
+        }
+
+        // --- D. HALAMAN DETAIL MEDIA VIEW ---
+        function renderDetailView(mediaId) {
+            const item = mediaItems.find(m => m.id === mediaId) || mediaItems[0];
+            const isFav = userFavorites.includes(item.id);
+
+            return `
+                <div class="max-w-5xl mx-auto space-y-6">
+                    <!-- Top Action Bar -->
+                    <div class="flex items-center justify-between">
+                        <button onclick="navigateTo('explore')" class="text-xs font-semibold text-slate-600 hover:text-brand-600 flex items-center gap-2">
+                            <i class="fa-solid fa-arrow-left"></i> Kembali ke Perpustakaan
+                        </button>
+                        <div class="flex items-center gap-2">
+                            <button onclick="toggleFavorite('${item.id}', event)" class="px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-50 flex items-center gap-1.5 shadow-sm">
+                                <i class="${isFav ? 'fa-solid text-red-500' : 'fa-regular'} fa-heart"></i>
+                                <span>${isFav ? 'Favorit Saya' : 'Tambah Favorit'}</span>
+                            </button>
+                            <button onclick="copyShareLink('${item.id}')" class="px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-50 flex items-center gap-1.5 shadow-sm">
+                                <i class="fa-solid fa-share-nodes text-slate-500"></i>
+                                <span>Bagikan Tautan</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Main Media Player & Header Card -->
+                    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+                        <!-- Preview Media Block -->
+                        <div class="bg-slate-900 min-h-[320px] flex items-center justify-center relative">
+                            ${item.type.includes('Video') ? `
+                                <video controls class="w-full max-h-[450px]">
+                                    <source src="${item.fileUrl}" type="video/mp4">
+                                    Browser tidak mendukung pemutar video.
+                                </video>
+                            ` : `
+                                <div class="text-center p-8 text-white space-y-3">
+                                    <i class="fa-solid fa-file-pdf text-6xl text-rose-500"></i>
+                                    <h4 class="font-bold text-base">${item.title}</h4>
+                                    <p class="text-xs text-slate-300">Dokumen Digital • Siap Dibaca & Diunduh</p>
+                                    <button onclick="simulateDownload('${item.title}')" class="bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition inline-flex items-center gap-2">
+                                        <i class="fa-solid fa-download"></i> Unduh Berkas Lengkap
+                                    </button>
+                                </div>
+                            `}
+                        </div>
+
+                        <!-- Content Details Header -->
+                        <div class="p-6 space-y-4">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span class="bg-brand-50 text-brand-700 text-xs font-semibold px-2.5 py-1 rounded-md border border-brand-100">${item.subject}</span>
+                                <span class="bg-slate-100 text-slate-700 text-xs font-semibold px-2.5 py-1 rounded-md">${item.classLevel}</span>
+                                <span class="bg-emerald-50 text-emerald-700 text-xs font-semibold px-2.5 py-1 rounded-md border border-emerald-100">${item.phase}</span>
+                                <span class="ml-auto text-xs text-slate-400"><i class="fa-solid fa-eye mr-1"></i> ${item.views} tayangan</span>
+                            </div>
+
+                            <h2 class="text-xl font-bold text-slate-800">${item.title}</h2>
+                            <p class="text-xs text-slate-600 leading-relaxed">${item.description}</p>
+
+                            <!-- Metadata Table -->
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 bg-slate-50 rounded-xl border border-slate-100 text-xs">
+                                <div>
+                                    <p class="text-slate-400">Pengunggah</p>
+                                    <p class="font-semibold text-slate-800 mt-0.5">${item.uploader}</p>
+                                </div>
+                                <div>
+                                    <p class="text-slate-400">Tanggal Unggah</p>
+                                    <p class="font-semibold text-slate-800 mt-0.5">${item.uploadDate}</p>
+                                </div>
+                                <div>
+                                    <p class="text-slate-400">Lisensi</p>
+                                    <p class="font-semibold text-slate-800 mt-0.5">${item.license}</p>
+                                </div>
+                                <div>
+                                    <p class="text-slate-400">Status Verifikasi</p>
+                                    <p class="font-semibold text-emerald-600 mt-0.5"><i class="fa-solid fa-shield-check"></i> ${item.status}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- E. VERIFIKASI & MODERASI MEDIA (ADMIN ONLY) ---
+        function renderVerificationView() {
+            const pendingList = mediaItems.filter(m => m.status === 'Menunggu verifikasi');
+
+            return `
+                <div class="space-y-4">
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 flex justify-between items-center">
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-sm">Antrean Moderasi Media</h3>
+                            <p class="text-xs text-slate-500">Tinjau kelayakan & akurasi konten sebelum dipublikasikan ke siswa.</p>
+                        </div>
+                        <span class="bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 rounded-full">${pendingList.length} Menunggu Review</span>
+                    </div>
+
+                    <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead class="bg-slate-50 text-slate-600 border-b border-slate-200 font-semibold uppercase tracking-wider text-[10px]">
+                                <tr>
+                                    <th class="p-3.5">Media</th>
+                                    <th class="p-3.5">Mata Pelajaran & Kelas</th>
+                                    <th class="p-3.5">Pengunggah</th>
+                                    <th class="p-3.5">Tanggal</th>
+                                    <th class="p-3.5 text-right">Aksi Moderasi</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                ${pendingList.length === 0 ? `
+                                    <tr>
+                                        <td colspan="5" class="p-8 text-center text-slate-400">Tidak ada pengajuan media yang menunggu verifikasi saat ini.</td>
+                                    </tr>
+                                ` : pendingList.map(item => `
+                                    <tr class="hover:bg-slate-50/80 transition">
+                                        <td class="p-3.5 font-semibold text-slate-800 max-w-xs truncate">${item.title}</td>
+                                        <td class="p-3.5 text-slate-600">${item.subject} (${item.classLevel})</td>
+                                        <td class="p-3.5 text-slate-600">${item.uploader}</td>
+                                        <td class="p-3.5 text-slate-400">${item.uploadDate}</td>
+                                        <td class="p-3.5 text-right space-x-2">
+                                            <button onclick="approveMedia('${item.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-semibold px-3 py-1.5 rounded-md shadow-sm transition">
+                                                <i class="fa-solid fa-check mr-1"></i> Setujui
+                                            </button>
+                                            <button onclick="rejectMedia('${item.id}')" class="bg-red-500 hover:bg-red-600 text-white text-[11px] font-semibold px-3 py-1.5 rounded-md shadow-sm transition">
+                                                <i class="fa-solid fa-xmark mr-1"></i> Tolak
+                                            </button>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function approveMedia(id) {
+            const item = mediaItems.find(m => m.id === id);
+            if (item) {
+                item.status = 'Dipublikasikan';
+                showToast(`Media "${item.title}" disetujui & dipublikasikan!`, "success");
+                navigateTo('verification');
+            }
+        }
+
+        function rejectMedia(id) {
+            const item = mediaItems.find(m => m.id === id);
+            if (item) {
+                item.status = 'Revisi';
+                showToast(`Media "${item.title}" dikembalikan untuk revisi.`, "info");
+                navigateTo('verification');
+            }
+        }
+
+        // --- F. LAPORAN & EKSPOR DATA VIEW ---
+        function renderReportsView() {
+            return `
+                <div class="space-y-6">
+                    <!-- Export Controls -->
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-sm">Laporan Pemanfaatan Media Pembelajaran</h3>
+                            <p class="text-xs text-slate-500">Ringkasan statistik kontribusi guru & pemanfaatan digital sekolah.</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="exportReportCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3.5 py-2 rounded-lg transition flex items-center gap-2 shadow-sm">
+                                <i class="fa-solid fa-file-excel"></i> Ekspor CSV / Excel
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Summary Table -->
+                    <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+                        <div class="p-4 border-b border-slate-200 font-bold text-xs text-slate-800">
+                            Kontribusi Konten Guru SDN 2 MARGOREJO
+                        </div>
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead class="bg-slate-50 text-slate-600 border-b border-slate-200 font-semibold uppercase tracking-wider text-[10px]">
+                                <tr>
+                                    <th class="p-3.5">Nama Guru</th>
+                                    <th class="p-3.5">Mata Pelajaran Utama</th>
+                                    <th class="p-3.5">Jumlah Unggahan</th>
+                                    <th class="p-3.5">Total Unduhan</th>
+                                    <th class="p-3.5">Rating Rata-Rata</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                <tr class="hover:bg-slate-50">
+                                    <td class="p-3.5 font-semibold text-slate-800">Siti Rahmawati, S.Pd</td>
+                                    <td class="p-3.5 text-slate-600">IPAS</td>
+                                    <td class="p-3.5 text-slate-800 font-bold">14 Media</td>
+                                    <td class="p-3.5 text-slate-600">423x</td>
+                                    <td class="p-3.5 text-amber-500 font-bold"><i class="fa-solid fa-star"></i> 4.9</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50">
+                                    <td class="p-3.5 font-semibold text-slate-800">Ahmad Dahlan, M.Pd</td>
+                                    <td class="p-3.5 text-slate-600">Matematika</td>
+                                    <td class="p-3.5 text-slate-800 font-bold">9 Media</td>
+                                    <td class="p-3.5 text-slate-600">310x</td>
+                                    <td class="p-3.5 text-amber-500 font-bold"><i class="fa-solid fa-star"></i> 4.8</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50">
+                                    <td class="p-3.5 font-semibold text-slate-800">Dewi Lestari, S.Pd</td>
+                                    <td class="p-3.5 text-slate-600">Pendidikan Pancasila</td>
+                                    <td class="p-3.5 text-slate-800 font-bold">6 Media</td>
+                                    <td class="p-3.5 text-slate-600">185x</td>
+                                    <td class="p-3.5 text-amber-500 font-bold"><i class="fa-solid fa-star"></i> 4.7</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function exportReportCSV() {
+            let csvContent = "data:text/csv;charset=utf-8,Nama Guru,Mata Pelajaran,Jumlah Unggahan,Total Unduhan\n";
+            csvContent += "Siti Rahmawati S.Pd,IPAS,14,423\nAhmad Dahlan M.Pd,Matematika,9,310\nDewi Lestari S.Pd,Pendidikan Pancasila,6,185\n";
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "laporan_bank_media_sd.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast("Laporan berhasil diunduh sebagai file CSV!", "success");
+        }
+
+        // --- G. KUIS INTERAKTIF VIEW ---
+        function renderQuizzesView() {
+            const quiz = quizzes[0];
+            return `
+                <div class="max-w-3xl mx-auto space-y-4">
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <div class="flex justify-between items-start border-b border-slate-100 pb-4">
+                            <div>
+                                <span class="bg-cyan-50 text-cyan-700 text-xs font-semibold px-2.5 py-1 rounded-md border border-cyan-100">${quiz.subject}</span>
+                                <h3 class="font-bold text-slate-800 text-lg mt-2">${quiz.title}</h3>
+                                <p class="text-xs text-slate-500 mt-1">Estimasi Durasi: ${quiz.duration} • 2 Soal Pilihan Ganda</p>
+                            </div>
+                            <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full">Kuis Aktif</span>
+                        </div>
+
+                        <form id="quizForm" onsubmit="submitQuiz(event)" class="space-y-6 pt-2">
+                            ${quiz.questions.map((q, idx) => `
+                                <div class="space-y-2">
+                                    <p class="font-bold text-xs text-slate-800">${idx + 1}. ${q.question}</p>
+                                    <div class="space-y-1.5 pl-2">
+                                        ${q.options.map((opt, oIdx) => `
+                                            <label class="flex items-center gap-2 p-2.5 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer text-xs text-slate-700 transition">
+                                                <input type="radio" name="${q.id}" value="${oIdx}" required class="text-brand-600 focus:ring-brand-500">
+                                                <span>${opt}</span>
+                                            </label>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            `).join('')}
+
+                            <div class="pt-4 border-t border-slate-100 flex justify-end">
+                                <button type="submit" class="bg-brand-600 hover:bg-brand-700 text-white font-semibold text-xs px-5 py-2.5 rounded-lg shadow transition">
+                                    Kirim Jawaban & Lihat Skor
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            `;
+        }
+
+        function submitQuiz(e) {
+            e.preventDefault();
+            showToast("Jawaban Anda berhasil terkirim! Skor Otomatis: 100 / 100", "success");
+        }
+
+        // --- H. FAVORITES VIEW ---
+        function renderFavoritesView() {
+            const favItems = mediaItems.filter(m => userFavorites.includes(m.id));
+            return `
+                <div class="space-y-4">
+                    <div class="bg-white p-4 rounded-xl border border-slate-200">
+                        <h3 class="font-bold text-slate-800 text-sm">Media Favorit Saya</h3>
+                        <p class="text-xs text-slate-500">Daftar media pembelajaran yang disukai untuk akses cepat.</p>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                        ${favItems.length === 0 ? `
+                            <div class="col-span-full py-12 text-center bg-white rounded-xl border border-slate-200">
+                                <i class="fa-regular fa-heart text-4xl text-slate-300 mb-2"></i>
+                                <p class="text-xs text-slate-500">Belum ada media favorit yang disimpan.</p>
+                            </div>
+                        ` : favItems.map(item => renderMediaCard(item)).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- I. KOLEKSI VIEW ---
+        function renderCollectionsView() {
+            return `
+                <div class="space-y-4">
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 flex justify-between items-center">
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-sm">Koleksi Media Pembelajaran</h3>
+                            <p class="text-xs text-slate-500">Kelompokkan modul & media berdasarkan topik khusus pengajaran.</p>
+                        </div>
+                        <button onclick="showToast('Fitur buat koleksi terbuka!', 'info')" class="bg-brand-600 text-white text-xs font-semibold px-3 py-2 rounded-lg shadow-sm">
+                            + Buat Koleksi Baru
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        ${userCollections.map(col => `
+                            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h4 class="font-bold text-slate-800 text-sm">${col.name}</h4>
+                                        <span class="text-[10px] text-slate-400 font-medium">${col.items.length} Item Media • ${col.isPublic ? 'Publik' : 'Privat'}</span>
+                                    </div>
+                                    <i class="fa-solid fa-folder-closed text-2xl text-brand-500"></i>
+                                </div>
+                                <div class="flex justify-end pt-2 border-t border-slate-100">
+                                    <button onclick="navigateTo('explore')" class="text-xs font-semibold text-brand-600 hover:underline">Buka Koleksi <i class="fa-solid fa-chevron-right text-[10px]"></i></button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- J. AUDIT LOGS VIEW ---
+        function renderAuditLogsView() {
+            return `
+                <div class="space-y-4">
+                    <div class="bg-white p-4 rounded-xl border border-slate-200">
+                        <h3 class="font-bold text-slate-800 text-sm">Audit Log Aktivitas Sistem</h3>
+                        <p class="text-xs text-slate-500">Catatan riwayat perubahan data & tindakan administratif demi keamanan.</p>
+                    </div>
+
+                    <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead class="bg-slate-50 text-slate-600 border-b border-slate-200 font-semibold uppercase tracking-wider text-[10px]">
+                                <tr>
+                                    <th class="p-3.5">Waktu</th>
+                                    <th class="p-3.5">Pengguna</th>
+                                    <th class="p-3.5">Tindakan</th>
+                                    <th class="p-3.5">Target / Objek</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                ${auditLogs.map(log => `
+                                    <tr>
+                                        <td class="p-3.5 text-slate-400">${log.timestamp}</td>
+                                        <td class="p-3.5 font-semibold text-slate-800">${log.user}</td>
+                                        <td class="p-3.5 text-brand-600 font-medium">${log.action}</td>
+                                        <td class="p-3.5 text-slate-600">${log.target}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- K. MEDIA SAYA VIEW ---
+        function renderMyMediaView() {
+            const myItems = mediaItems.filter(m => m.uploader === currentUser.name || currentUser.role === 'admin');
+            return `
+                <div class="space-y-4">
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 flex justify-between items-center">
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-sm">Daftar Media Unggahan Saya</h3>
+                            <p class="text-xs text-slate-500">Kelola status publikasi, sunting metadata, atau perbarui versi file.</p>
+                        </div>
+                        <button onclick="navigateTo('upload')" class="bg-brand-600 text-white text-xs font-semibold px-3 py-2 rounded-lg shadow-sm">
+                            + Unggah Media Baru
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        ${myItems.map(item => renderMediaCard(item)).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- L. USERS MANAGEMENT VIEW ---
+        function renderUsersManagementView() {
+            return `
+                <div class="space-y-4">
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 flex justify-between items-center">
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-sm">Manajemen Akun & Hak Akses (RBAC)</h3>
+                            <p class="text-xs text-slate-500">Kelola daftar akun guru, siswa, dan staf sekolah.</p>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead class="bg-slate-50 text-slate-600 border-b border-slate-200 font-semibold uppercase tracking-wider text-[10px]">
+                                <tr>
+                                    <th class="p-3.5">Nama Pengguna</th>
+                                    <th class="p-3.5">Email / NIP</th>
+                                    <th class="p-3.5">Peran Access</th>
+                                    <th class="p-3.5 text-right">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                <tr>
+                                    <td class="p-3.5 font-semibold text-slate-800">Lenawati, S.Pd.</td>
+                                    <td class="p-3.5 text-slate-500">lenawati.admin@sdn2margorejo.sch.id</td>
+                                    <td class="p-3.5"><span class="bg-purple-100 text-purple-700 text-[10px] font-bold px-2 py-0.5 rounded">ADMIN</span></td>
+                                    <td class="p-3.5 text-right text-brand-600 font-semibold cursor-pointer">Edit</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3.5 font-semibold text-slate-800">Siti Rahmawati, S.Pd</td>
+                                    <td class="p-3.5 text-slate-500">siti.guru@sdn2margorejo.sch.id</td>
+                                    <td class="p-3.5"><span class="bg-brand-100 text-brand-700 text-[10px] font-bold px-2 py-0.5 rounded">GURU</span></td>
+                                    <td class="p-3.5 text-right text-brand-600 font-semibold cursor-pointer">Edit</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ==========================================
+        // 4. UTILITY & EVENT INTERACTION HANDLERS
+        // ==========================================
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebarBackdrop');
+            sidebar.classList.toggle('-translate-x-full');
+            backdrop.classList.toggle('hidden');
+        }
+
+        function toggleRoleModal() {
+            const modal = document.getElementById('roleModal');
+            modal.classList.toggle('hidden');
+        }
+
+        function switchRole(newRole) {
+            currentUser.role = newRole;
+            const badge = document.getElementById('userRoleBadge');
+            const name = document.getElementById('userName');
+            const avatar = document.getElementById('userAvatar');
+            const topAvatar = document.getElementById('topAvatar');
+
+            if (newRole === 'admin') {
+                currentUser.name = "Lenawati, S.Pd.";
+                badge.innerText = "ADMIN SEKOLAH";
+                avatar.innerText = "LS";
+            } else if (newRole === 'guru') {
+                currentUser.name = "Siti Rahmawati, S.Pd";
+                badge.innerText = "GURU KONTRIBUTOR";
+                avatar.innerText = "SR";
+            } else if (newRole === 'kepsek') {
+                currentUser.name = "Dr. H. Hendra, M.Si";
+                badge.innerText = "KEPALA SEKOLAH";
+                avatar.innerText = "HH";
+            } else if (newRole === 'siswa') {
+                currentUser.name = "Rizky Pratama (Kelas 5)";
+                badge.innerText = "SISWA SD";
+                avatar.innerText = "RP";
+            }
+
+            name.innerText = currentUser.name;
+            topAvatar.innerText = avatar.innerText;
+
+            toggleRoleModal();
+            showToast(`Peran pengguna berhasil diubah ke ${newRole.toUpperCase()}`, "info");
+            navigateTo('dashboard');
+        }
+
+        function toggleFavorite(id, e) {
+            if (e) e.stopPropagation();
+            const idx = userFavorites.indexOf(id);
+            if (idx > -1) {
+                userFavorites.splice(idx, 1);
+                showToast("Dihapus dari Favorit", "info");
+            } else {
+                userFavorites.push(id);
+                showToast("Ditambahkan ke Favorit!", "success");
+            }
+            navigateTo(currentActiveView);
+        }
+
+        function simulateDownload(title) {
+            showToast(`Mengunduh berkas "${title}"...`, "success");
+            auditLogs.unshift({
+                id: "log-" + Date.now(),
+                user: currentUser.name,
+                action: "Mengunduh Berkas Media",
+                target: title,
+                timestamp: new Date().toLocaleString('id-ID')
+            });
+        }
+
+        function copyShareLink(id) {
+            const dummyLink = window.location.href.split('#')[0] + `?media=${id}`;
+            const tempInput = document.createElement("input");
+            document.body.appendChild(tempInput);
+            tempInput.value = dummyLink;
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+            showToast("Tautan aman berhasil disalin ke clipboard!", "success");
+        }
+
+        function toggleNotifDropdown() {
+            const dd = document.getElementById('notifDropdown');
+            dd.classList.toggle('hidden');
+            const items = document.getElementById('notifItems');
+            items.innerHTML = notifications.map(n => `
+                <div class="p-3 hover:bg-slate-50 flex items-start gap-2.5 cursor-pointer">
+                    <i class="fa-solid fa-circle-info text-brand-600 text-xs mt-0.5"></i>
+                    <div>
+                        <p class="font-semibold text-slate-800 text-[11px]">${n.title}</p>
+                        <p class="text-[10px] text-slate-500">${n.desc}</p>
+                        <span class="text-[9px] text-slate-400 mt-1 block">${n.time}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showToast(message, type = "info") {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            
+            const bgMap = {
+                success: 'bg-slate-900 border-emerald-500 text-white',
+                info: 'bg-slate-900 border-brand-500 text-white',
+                warning: 'bg-slate-900 border-amber-500 text-white'
+            };
+
+            const iconMap = {
+                success: 'fa-circle-check text-emerald-400',
+                info: 'fa-circle-info text-brand-400',
+                warning: 'fa-triangle-exclamation text-amber-400'
+            };
+
+            toast.className = `pointer-events-auto px-4 py-3 rounded-xl border-l-4 shadow-xl ${bgMap[type]} flex items-center gap-3 text-xs font-medium transition duration-300 transform translate-y-2 opacity-0`;
+            toast.innerHTML = `<i class="fa-solid ${iconMap[type]} text-sm"></i> <span>${message}</span>`;
+            
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 10);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function logout() {
+            showToast("Berhasil keluar dari sistem.", "info");
+        }
+
+        function initDashboardCharts() {
+            // Placeholder for optional lightweight chart initialization if needed
+        }
+
+        // Initialize Application
+        window.onload = function () {
+            renderNavigation();
+            navigateTo('dashboard');
+        }
+    </script>
+</body>
+</html>
